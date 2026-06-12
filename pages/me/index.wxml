@@ -1,0 +1,25 @@
+<view class="container">
+  <view class="topbar">
+    <text class="topbar-title">我的</text>
+  </view>
+  <view class="profile-header">
+    <view class="profile-avatar">😀</view>
+    <text class="profile-name">火用户</text>
+    <text class="profile-desc">在火找到属于自己的温暖</text>
+    <view class="profile-stats">
+      <view class="stat-item"><text class="stat-num">12</text><text class="stat-label">心愿</text></view>
+      <view class="stat-item"><text class="stat-num">28</text><text class="stat-label">获赞</text></view>
+      <view class="stat-item"><text class="stat-num">56</text><text class="stat-label">关注</text></view>
+    </view>
+  </view>
+  <view class="menu-group">
+    <view class="menu-item"><view class="menu-icon" style="background:#FFF0EB">📝</view><text class="menu-text">我的帖子</text><text class="menu-arrow">›</text></view>
+    <view class="menu-item"><view class="menu-icon" style="background:#F0FFF0">🌳</view><text class="menu-text">我的心愿</text><text class="menu-arrow">›</text></view>
+    <view class="menu-item"><view class="menu-icon" style="background:#F0F4FF">❤️</view><text class="menu-text">我的点赞</text><text class="menu-arrow">›</text></view>
+    <view class="menu-item"><view class="menu-icon" style="background:#FFF5F5">⭐</view><text class="menu-text">我的收藏</text><text class="menu-arrow">›</text></view>
+  </view>
+  <view class="menu-group">
+    <view class="menu-item"><view class="menu-icon" style="background:#F5F5F5">⚙️</view><text class="menu-text">设置</text><text class="menu-arrow">›</text></view>
+    <view class="menu-item"><view class="menu-icon" style="background:#F5F5F5">📖</view><text class="menu-text">关于火</text><text class="menu-arrow">›</text></view>
+  </view>
+</view>
