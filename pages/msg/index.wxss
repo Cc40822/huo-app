@@ -1,0 +1,11 @@
+.container { min-height: 100vh; background: #f5f5f5; }
+.topbar { height: 56px; background: #fff; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: center; }
+.topbar-title { font-size: 18px; font-weight: 600; }
+.msg-list { background: #fff; }
+.msg-item { display: flex; align-items: center; padding: 14px 16px; border-bottom: 1px solid #f0f0f0; }
+.msg-avatar { width: 48px; height: 48px; border-radius: 50%; background: #FFE4D6; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; position: relative; }
+.msg-badge { position: absolute; top: -2px; right: -2px; background: #FF3B3B; color: #fff; font-size: 10px; min-width: 16px; height: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.msg-info { flex: 1; margin-left: 12px; }
+.msg-name { font-size: 15px; font-weight: 500; }
+.msg-preview { font-size: 13px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; margin-top: 2px; }
+.msg-time { font-size: 11px; color: #888; flex-shrink: 0; }
