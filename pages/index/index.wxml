@@ -1,0 +1,131 @@
+<view class="container">
+  <!-- 发现页 -->
+  <view class="page-area">
+    <!-- 横幅 -->
+    <view class="banner">
+      <view class="banner-text">
+        <text class="banner-title">欢迎来到火</text>
+        <text class="banner-sub">粉丝专属的温暖社区</text>
+      </view>
+      <text class="banner-emoji">🔥</text>
+    </view>
+
+    <!-- 快捷入口 -->
+    <view class="section-title">快捷入口</view>
+    <view class="feature-grid">
+      <view class="feature-card" bindtap="openAI">
+        <view class="feature-icon" style="background:#FFF0EB">🤖</view>
+        <text class="feature-title">AI陪聊</text>
+        <text class="feature-desc">随时倾诉，AI温暖陪伴</text>
+      </view>
+      <view class="feature-card" bindtap="openWishTree">
+        <view class="feature-icon" style="background:#F0FFF0">🌳</view>
+        <text class="feature-title">许愿树</text>
+        <text class="feature-desc">种下心愿，静待花开</text>
+      </view>
+      <view class="feature-card" bindtap="openCommunity">
+        <view class="feature-icon" style="background:#F0F4FF">👥</view>
+        <text class="feature-title">粉丝社区</text>
+        <text class="feature-desc">和志同道合的朋友交流</text>
+      </view>
+      <view class="feature-card" bindtap="switchTabMsg">
+        <view class="feature-icon" style="background:#FFF5F5">💬</view>
+        <text class="feature-title">消息中心</text>
+        <text class="feature-desc">互动不再错过</text>
+      </view>
+    </view>
+
+    <!-- AI入口 -->
+    <view class="section-title">智能陪伴</view>
+    <view class="ai-card" bindtap="openAI">
+      <view class="ai-avatar">🤖</view>
+      <view class="ai-info">
+        <text class="ai-name">小火</text>
+        <text class="ai-desc">你的专属AI陪伴助手</text>
+      </view>
+      <button class="ai-enter">进入聊天</button>
+    </view>
+
+    <!-- 最新心愿 -->
+    <view class="section-title">最新心愿</view>
+    <view wx:for="{{wishes}}" wx:key="id" class="wish-card">
+      <view class="wish-header">
+        <view class="wish-avatar">{{item.avatar}}</view>
+        <text class="wish-user">{{item.user}}</text>
+        <text class="wish-time">{{item.time}}</text>
+      </view>
+      <view class="wish-content">{{item.content}}</view>
+      <view class="wish-footer">
+        <view class="wish-action {{item.liked?'liked':''}}" bindtap="toggleLike" data-id="{{item.id}}">
+          {{item.liked?'❤️':'🤍'}} {{item.likes}}
+        </view>
+        <view class="wish-action" bindtap="showDetail" data-item="{{item}}">💬 评论</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- AI聊天页 -->
+  <view class="sub-page" style="display:{{showAI?'block':'none'}}">
+    <view class="topbar">
+      <view class="topbar-back" bindtap="closeAI">← 返回</view>
+      <text class="topbar-title">AI陪聊</text>
+    </view>
+    <scroll-view class="chat-messages" scroll-y="true" scroll-top="{{chatScrollTop}}">
+      <view wx:for="{{chatMsgs}}" wx:key="id" class="chat-msg {{item.isUser?'user':''}}">
+        <view class="chat-avatar">{{item.isUser?'😀':'🤖'}}</view>
+        <view class="chat-bubble">{{item.text}}</view>
+      </view>
+    </scroll-view>
+    <view class="chat-input-bar">
+      <input class="chat-input" placeholder="说点什么..." bindinput="onChatInput" value="{{chatInput}}" confirm-type="send" bindconfirm="sendChat" />
+      <button class="chat-send" bindtap="sendChat">➤</button>
+    </view>
+  </view>
+
+  <!-- 许愿树页 -->
+  <view class="sub-page" style="display:{{showWish?'block':'none'}}">
+    <view class="topbar">
+      <view class="topbar-back" bindtap="closeWish">← 返回</view>
+      <text class="topbar-title">许愿树</text>
+    </view>
+    <view class="wish-compose">
+      <textarea class="wish-input" placeholder="许下你的心愿..." bindinput="onWishInput" value="{{wishInput}}" />
+      <button class="wish-submit" bindtap="submitWish">发布心愿</button>
+    </view>
+    <view wx:for="{{wishes}}" wx:key="id" class="wish-card">
+      <view class="wish-header">
+        <view class="wish-avatar">{{item.avatar}}</view>
+        <text class="wish-user">{{item.user}}</text>
+        <text class="wish-time">{{item.time}}</text>
+      </view>
+      <view class="wish-content">{{item.content}}</view>
+      <view class="wish-footer">
+        <view class="wish-action {{item.liked?'liked':''}}" bindtap="toggleLike" data-id="{{item.id}}">
+          {{item.liked?'❤️':'🤍'}} {{item.likes}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 社区页 -->
+  <view class="sub-page" style="display:{{showCommunity?'block':'none'}}">
+    <view class="topbar">
+      <view class="topbar-back" bindtap="closeCommunity">← 返回</view>
+      <text class="topbar-title">粉丝社区</text>
+    </view>
+    <scroll-view scroll-y="true">
+      <view wx:for="{{posts}}" wx:key="id" class="wish-card">
+        <view class="wish-header">
+          <view class="wish-avatar">{{item.avatar}}</view>
+          <text class="wish-user">{{item.user}}</text>
+          <text class="wish-time">{{item.time}}</text>
+        </view>
+        <view class="wish-content">{{item.content}}</view>
+        <view class="wish-footer">
+          <view class="wish-action">❤️ {{item.likes}}</view>
+          <view class="wish-action">💬 {{item.comments}}</view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+</view>
