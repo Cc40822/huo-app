@@ -1,0 +1,31 @@
+<view class="container">
+  <view class="topbar">
+    <text class="topbar-title">消息中心</text>
+  </view>
+  <view class="msg-list">
+    <view class="msg-item">
+      <view class="msg-avatar">🤖<view class="msg-badge">3</view></view>
+      <view class="msg-info">
+        <text class="msg-name">小火</text>
+        <text class="msg-preview">今天有什么想聊的吗？</text>
+      </view>
+      <text class="msg-time">刚刚</text>
+    </view>
+    <view class="msg-item">
+      <view class="msg-avatar">🌳</view>
+      <view class="msg-info">
+        <text class="msg-name">许愿树</text>
+        <text class="msg-preview">你的心愿被3人点赞了</text>
+      </view>
+      <text class="msg-time">10分钟前</text>
+    </view>
+    <view class="msg-item">
+      <view class="msg-avatar">👥</view>
+      <view class="msg-info">
+        <text class="msg-name">粉丝社区</text>
+        <text class="msg-preview">小明：大家周末愉快！</text>
+      </view>
+      <text class="msg-time">1小时前</text>
+    </view>
+  </view>
+</view>
