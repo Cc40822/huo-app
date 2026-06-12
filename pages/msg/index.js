@@ -1,0 +1,4 @@
+// msg page
+Page({
+  data: {}
+});
