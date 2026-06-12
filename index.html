@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>火 - 粉丝社区</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#FF6B35">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="火">
+  <style>
+    :root {
+      --primary: #FF6B35;
+      --primary-light: #FFF0EB;
+      --bg: #F5F5F5;
+      --card: #FFFFFF;
+      --text: #1A1A1A;
+      --text-secondary: #888;
+      --border: #EEEEEE;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; background: var(--bg); color: var(--text); height: 100dvh; overflow: hidden; }
+    
+    /* top bar */
+    .topbar { height: 56px; background: var(--card); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 100; }
+    .topbar-title { font-size: 18px; font-weight: 600; }
+    .topbar-back { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; position: absolute; left: 0; top: 6px; }
+    
+    /* pages */
+    .page { display: none; height: calc(100dvh - 56px - 60px - var(--safe-bottom)); overflow-y: auto; overflow-x: hidden; }
+    .page.active { display: block; }
+    
+    /* 发现 page */
+    .banner { margin: 12px 16px; border-radius: 16px; overflow: hidden; height: 140px; background: linear-gradient(135deg, #FF6B35, #FF8C5A); display: flex; align-items: center; padding: 20px; color: white; }
+    .banner-text h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+    .banner-text p { font-size: 13px; opacity: 0.9; }
+    .banner-emoji { font-size: 64px; margin-left: auto; }
+    
+    .section-title { font-size: 18px; font-weight: 600; padding: 16px 16px 10px; }
+    .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 16px; }
+    .feature-card { background: var(--card); border-radius: 16px; padding: 20px 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .feature-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .feature-card h3 { font-size: 15px; font-weight: 600; }
+    .feature-card p { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
+    
+    .ai-card { background: var(--card); border-radius: 16px; margin: 0 16px 12px; padding: 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .ai-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #FF6B35, #FFB085); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+    .ai-info h3 { font-size: 15px; font-weight: 600; }
+    .ai-info p { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+    .ai-enter { margin-left: auto; background: var(--primary); color: white; border: none; padding: 6px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; }
+    
+    .wish-card { background: var(--card); border-radius: 16px; margin: 0 16px 12px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .wish-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .wish-avatar { width: 36px; height: 36px; border-radius: 50%; background: #FFE4D6; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .wish-user { font-size: 14px; font-weight: 500; }
+    .wish-time { font-size: 11px; color: var(--text-secondary); margin-left: auto; }
+    .wish-content { font-size: 14px; line-height: 1.6; color: #333; }
+    .wish-footer { display: flex; gap: 20px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+    .wish-action { font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; cursor: pointer; }
+    .wish-action.liked { color: var(--primary); }
+    
+    /* 消息 page */
+    .msg-list { background: var(--card); }
+    .msg-item { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--border); cursor: pointer; }
+    .msg-item:last-child { border-bottom: none; }
+    .msg-avatar { width: 48px; height: 48px; border-radius: 50%; background: #FFE4D6; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; position: relative; }
+    .msg-badge { position: absolute; top: -2px; right: -2px; background: #FF3B3B; color: white; font-size: 10px; min-width: 16px; height: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: center; padding: 0 4px; }
+    .msg-info { flex: 1; min-width: 0; }
+    .msg-name { font-size: 15px; font-weight: 500; }
+    .msg-preview { font-size: 13px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+    .msg-time { font-size: 11px; color: var(--text-secondary); flex-shrink: 0; }
+    
+    /* 我的 page */
+    .profile-header { background: var(--card); padding: 24px 16px 20px; text-align: center; border-bottom: 1px solid var(--border); }
+    .profile-avatar { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, #FF6B35, #FFB085); display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto 12px; }
+    .profile-name { font-size: 18px; font-weight: 600; }
+    .profile-desc { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+    .profile-stats { display: flex; justify-content: center; gap: 32px; margin-top: 16px; }
+    .stat-item { text-align: center; }
+    .stat-num { font-size: 18px; font-weight: 700; }
+    .stat-label { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+    
+    .menu-group { background: var(--card); margin-top: 12px; }
+    .menu-item { display: flex; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--border); cursor: pointer; }
+    .menu-item:last-child { border-bottom: none; }
+    .menu-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-right: 12px; }
+    .menu-text { font-size: 15px; flex: 1; }
+    .menu-arrow { color: var(--text-secondary); font-size: 14px; }
+    
+    /* bottom nav */
+    .bottom-nav { height: 60px; background: var(--card); border-top: 1px solid var(--border); display: flex; padding-bottom: var(--safe-bottom); position: fixed; bottom: 0; left: 0; right: 0; z-index: 200; }
+    .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; color: var(--text-secondary); transition: color 0.2s; -webkit-tap-highlight-color: transparent; }
+    .nav-item.active { color: var(--primary); }
+    .nav-icon { font-size: 22px; line-height: 1; }
+    .nav-label { font-size: 10px; }
+    
+    /* sub pages */
+    .sub-page { display: none; height: 100dvh; background: var(--bg); position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 300; overflow-y: auto; }
+    .sub-page.active { display: block; }
+    
+    /* AI chat */
+    .chat-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+    .chat-msg { display: flex; gap: 8px; align-items: flex-end; }
+    .chat-msg.user { flex-direction: row-reverse; }
+    .chat-bubble { max-width: 75%; padding: 10px 14px; border-radius: 16px; font-size: 15px; line-height: 1.5; }
+    .chat-msg:not(.user) .chat-bubble { background: var(--card); border-bottom-left-radius: 4px; }
+    .chat-msg.user .chat-bubble { background: var(--primary); color: white; border-bottom-right-radius: 4px; }
+    .chat-input-bar { background: var(--card); padding: 10px 16px; display: flex; gap: 10px; align-items: center; border-top: 1px solid var(--border); padding-bottom: calc(10px + var(--safe-bottom)); }
+    .chat-input { flex: 1; background: var(--bg); border: none; border-radius: 20px; padding: 10px 16px; font-size: 15px; outline: none; }
+    .chat-send { background: var(--primary); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    
+    /* 许愿树 */
+    .wish-compose { background: var(--card); padding: 16px; margin: 12px 16px; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .wish-input { width: 100%; background: var(--bg); border: none; border-radius: 12px; padding: 12px; font-size: 14px; resize: none; height: 80px; outline: none; font-family: inherit; }
+    .wish-submit { background: var(--primary); color: white; border: none; padding: 8px 20px; border-radius: 20px; font-size: 13px; cursor: pointer; margin-top: 10px; float: right; }
+    
+    /* overlay wish detail */
+    .wish-detail-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 400; }
+    .wish-detail-overlay.active { display: flex; align-items: flex-end; }
+    .wish-detail-sheet { background: var(--card); border-radius: 20px 20px 0 0; width: 100%; padding: 20px 16px; max-height: 70vh; overflow-y: auto; }
+    .sheet-handle { width: 40px; height: 4px; background: #DDD; border-radius: 2px; margin: 0 auto 16px; }
+    .sheet-title { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+    
+    /* loading skeleton */
+    @keyframes shimmer {0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+    .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+  </style>
+</head>
+<body>
+
+<!-- ============ 主框架 ============ -->
+<!-- Topbar -->
+<div class="topbar" id="topbar">
+  <div class="topbar-back" id="topbarBack" style="visibility:hidden" onclick="goBack()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <div class="topbar-title" id="topbarTitle">火</div>
+</div>
+
+<!-- ============ 发现 ============ -->
+<div class="page active" id="page-find" data-title="发现">
+  <div class="banner">
+    <div class="banner-text">
+      <h2>欢迎来到火</h2>
+      <p>粉丝专属的温暖社区</p>
+    </div>
+    <div class="banner-emoji">🔥</div>
+  </div>
+  
+  <h3 class="section-title">快捷入口</h3>
+  <div class="feature-grid">
+    <div class="feature-card" onclick="openAI()">
+      <div class="feature-icon" style="background:#FFF0EB">🤖</div>
+      <h3>AI 陪聊</h3>
+      <p>随时倾诉，AI温暖陪伴</p>
+    </div>
+    <div class="feature-card" onclick="openWishTree()">
+      <div class="feature-icon" style="background:#F0FFF0">🌳</div>
+      <h3>许愿树</h3>
+      <p>种下心愿，静待花开</p>
+    </div>
+    <div class="feature-card" onclick="openCommunity()">
+      <div class="feature-icon" style="background:#F0F4FF">👥</div>
+      <h3>粉丝社区</h3>
+      <p>和志同道合的朋友交流</p>
+    </div>
+    <div class="feature-card" onclick="openMessages()">
+      <div class="feature-icon" style="background:#FFF5F5">💬</div>
+      <h3>消息中心</h3>
+      <p>互动不再错过</p>
+    </div>
+  </div>
+  
+  <h3 class="section-title">智能陪伴</h3>
+  <div class="ai-card" onclick="openAI()">
+    <div class="ai-avatar">🤖</div>
+    <div class="ai-info">
+      <h3>小火</h3>
+      <p>你的专属AI陪伴助手</p>
+    </div>
+    <button class="ai-enter">进入聊天</button>
+  </div>
+  
+  <h3 class="section-title">最新心愿</h3>
+  <div id="wishList"></div>
+</div>
+
+<!-- ============ 消息 ============ -->
+<div class="page" id="page-msg" data-title="消息">
+  <div class="msg-list">
+    <div class="msg-item" onclick="openAI()">
+      <div class="msg-avatar">🤖<div class="msg-badge">3</div></div>
+      <div class="msg-info">
+        <div class="msg-name">小火</div>
+        <div class="msg-preview">今天有什么想聊的吗？</div>
+      </div>
+      <div class="msg-time">刚刚</div>
+    </div>
+    <div class="msg-item">
+      <div class="msg-avatar">🌳</div>
+      <div class="msg-info">
+        <div class="msg-name">许愿树</div>
+        <div class="msg-preview">你的心愿被3人点赞了</div>
+      </div>
+      <div class="msg-time">10分钟前</div>
+    </div>
+    <div class="msg-item">
+      <div class="msg-avatar">👥</div>
+      <div class="msg-info">
+        <div class="msg-name">粉丝社区</div>
+        <div class="msg-preview">小明明：大家周末愉快！</div>
+      </div>
+      <div class="msg-time">1小时前</div>
+    </div>
+    <div class="msg-item">
+      <div class="msg-avatar">❤️</div>
+      <div class="msg-info">
+        <div class="msg-name">互动通知</div>
+        <div class="msg-preview">有5条新的点赞和评论</div>
+      </div>
+      <div class="msg-time">2小时前</div>
+    </div>
+    <div class="msg-item">
+      <div class="msg-avatar">🔔</div>
+      <div class="msg-info">
+        <div class="msg-name">系统通知</div>
+        <div class="msg-preview">欢迎加入火大家庭！</div>
+      </div>
+      <div class="msg-time">昨天</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 我的 ============ -->
+<div class="page" id="page-me" data-title="我的">
+  <div class="profile-header">
+    <div class="profile-avatar">😊</div>
+    <div class="profile-name">火用户</div>
+    <div class="profile-desc">在火找到属于自己的温暖</div>
+    <div class="profile-stats">
+      <div class="stat-item"><div class="stat-num">12</div><div class="stat-label">心愿</div></div>
+      <div class="stat-item"><div class="stat-num">28</div><div class="stat-label">获赞</div></div>
+      <div class="stat-item"><div class="stat-num">56</div><div class="stat-label">关注</div></div>
+    </div>
+  </div>
+  
+  <div class="menu-group">
+    <div class="menu-item"><div class="menu-icon" style="background:#FFF0EB">📝</div><div class="menu-text">我的帖子</div><div class="menu-arrow">›</div></div>
+    <div class="menu-item"><div class="menu-icon" style="background:#F0FFF0">🌳</div><div class="menu-text">我的心愿</div><div class="menu-arrow">›</div></div>
+    <div class="menu-item"><div class="menu-icon" style="background:#F0F4FF">❤️</div><div class="menu-text">我的点赞</div><div class="menu-arrow">›</div></div>
+    <div class="menu-item"><div class="menu-icon" style="background:#FFF5F5">⭐</div><div class="menu-text">我的收藏</div><div class="menu-arrow">›</div></div>
+  </div>
+  
+  <div class="menu-group">
+    <div class="menu-item"><div class="menu-icon" style="background:#F5F5F5">⚙️</div><div class="menu-text">设置</div><div class="menu-arrow">›</div></div>
+    <div class="menu-item"><div class="menu-icon" style="background:#F5F5F5">📖</div><div class="menu-text">关于火</div><div class="menu-arrow">›</div></div>
+  </div>
+</div>
+
+<!-- ============ 底部导航 ============ -->
+<div class="bottom-nav">
+  <div class="nav-item active" onclick="switchTab('find')">
+    <div class="nav-icon">🔍</div>
+    <div class="nav-label">发现</div>
+  </div>
+  <div class="nav-item" onclick="switchTab('msg')">
+    <div class="nav-icon">💬</div>
+    <div class="nav-label">消息</div>
+  </div>
+  <div class="nav-item" onclick="switchTab('me')">
+    <div class="nav-icon">👤</div>
+    <div class="nav-label">我的</div>
+  </div>
+</div>
+
+<!-- ============ AI 聊天子页面 ============ -->
+<div class="sub-page" id="sub-ai">
+  <div class="topbar">
+    <div class="topbar-back" onclick="closeSub('sub-ai')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="topbar-title">AI 陪聊</div>
+  </div>
+  <div id="chatMessages" class="chat-messages" style="height: calc(100dvh - 56px - 60px - env(safe-area-inset-bottom, 0px)); overflow-y: auto; display: flex; flex-direction: column; gap: 16px; padding: 16px;"></div>
+  <div class="chat-input-bar">
+    <input class="chat-input" id="chatInput" placeholder="说点什么..." onkeydown="if(event.key==='Enter')sendChat()">
+    <button class="chat-send" onclick="sendChat()">➤</button>
+  </div>
+</div>
+
+<!-- ============ 许愿树子页面 ============ -->
+<div class="sub-page" id="sub-wish">
+  <div class="topbar">
+    <div class="topbar-back" onclick="closeSub('sub-wish')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="topbar-title">许愿树</div>
+  </div>
+  <div style="padding: 12px 16px0;">
+    <div class="wish-compose">
+      <textarea class="wish-input" id="wishInput" placeholder="许下你的心愿..."></textarea>
+      <button class="wish-submit" onclick="submitWish()">发布心愿</button>
+      <div style="clear:both"></div>
+    </div>
+  </div>
+  <div id="wishListPage" style="padding-bottom: 20px;"></div>
+</div>
+
+<!-- ============ 社区子页面 ============ -->
+<div class="sub-page" id="sub-community">
+  <div class="topbar">
+    <div class="topbar-back" onclick="closeSub('sub-community')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="topbar-title">粉丝社区</div>
+  </div>
+  <div style="height: calc(100dvh - 56px); overflow-y: auto; padding-bottom: 20px;">
+    <div id="postList" style="padding: 12px 16px; display: flex; flex-direction: column; gap: 12px;"></div>
+  </div>
+</div>
+
+<!-- ============ 帖子详情 Overlay ============ -->
+<div class="wish-detail-overlay" id="postOverlay">
+  <div class="wish-detail-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="sheetTitle">帖子详情</div>
+    <div id="sheetContent"></div>
+    <div style="height: 20px;"></div>
+  </div>
+</div>
+
+<script>
+// ========== 状态 ==========
+let currentTab = 'find';
+let pageStack = [];
+const TAB_MAP = { 'find': 'page-find', 'msg': 'page-msg', 'me': 'page-me' };
+
+// ========== 底部导航 ==========
+function switchTab(tab) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + tab).classList.add('active');
+  document.querySelectorAll('.nav-item')[tab === 'find' ? 0 : tab === 'msg' ? 1 : 2].classList.add('active');
+  currentTab = tab;
+  document.getElementById('topbarTitle').textContent = ['发现', '消息', '我的'][tab === 'find' ? 0 : tab === 'msg' ? 1 : 2];
+  document.getElementById('topbarBack').style.visibility = 'hidden';
+}
+
+// ========== 子页面 ==========
+function openSub(id) {
+  pageStack.push({ tab: currentTab, title: document.getElementById('topbarTitle').textContent });
+  document.getElementById(id).classList.add('active');
+  const titles = { 'sub-ai': 'AI 陪聊', 'sub-wish': '许愿树', 'sub-community': '粉丝社区' };
+  document.getElementById('topbarTitle').textContent = titles[id];
+  document.getElementById('topbarBack').style.visibility = 'visible';
+}
+
+function closeSub(id) {
+  document.getElementById(id).classList.remove('active');
+  if (pageStack.length > 0) {
+    const prev = pageStack.pop();
+    document.getElementById('topbarTitle').textContent = prev.title;
+    if (pageStack.length === 0) document.getElementById('topbarBack').style.visibility = 'hidden';
+  }
+}
+
+function goBack() {
+  if (pageStack.length > 0) {
+    closeSub(Object.keys({ 'sub-ai': 1, 'sub-wish': 1, 'sub-community': 1 }).find(k => document.getElementById(k).classList.contains('active')) || 'sub-ai');
+  }
+}
+
+// ========== AI 聊天 ==========
+const AI_MSGS = [
+  "你好呀！今天心情怎么样？😊",
+  "有什么想聊的吗？我在这里陪你~",
+  "记得对自己好一点，你已经很棒了！💪",
+  "今天的天气很适合出门走走呢~",
+  "加油！每一天都是新的开始🌟",
+  "我在这里，随时听你倾诉💬"
+];
+
+function openAI() {
+  openSub('sub-ai');
+  const container = document.getElementById('chatMessages');
+  if (container.children.length === 0) {
+    addChatMsg('你好！我是小火，你的专属AI陪伴助手 🤖 有什么想聊的吗？', false);
+  }
+  document.getElementById('chatInput').focus();
+}
+
+function addChatMsg(text, isUser) {
+  const container = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg' + (isUser ? ' user' : '');
+  const avatar = document.createElement('div');
+  avatar.className = 'ai-avatar';
+  avatar.style.cssText = 'width:32px;height:32px;font-size:16px;flex-shrink:0;';
+  avatar.textContent = isUser ? '😊' : '🤖';
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-bubble';
+  bubble.textContent = text;
+  div.appendChild(avatar);
+  div.appendChild(bubble);
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function sendChat() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  addChatMsg(text, true);
+  input.value = '';
+  setTimeout(() => {
+    const reply = AI_MSGS[Math.floor(Math.random() * AI_MSGS.length)];
+    addChatMsg(reply, false);
+  }, 600 + Math.random() * 800);
+}
+
+// ========== 许愿树 ==========
+let wishLikes = {};
+const SAMPLE_WISHES = [
+  { user: '小明明', avatar: '😊', content: '希望每天都能开开心心的！', time: '2小时前', likes: 24 },
+  { user: '星星糖', avatar: '⭐', content: '许愿家人都健康平安🙏', time: '5小时前', likes: 18 },
+  { user: '阳光少年', avatar: '🌞', content: '希望今年能遇到心动的TA💕', time: '昨天', likes: 42 },
+  { user: '小幸运', avatar: '🍀', content: '祝自己心想事成，万事如意！', time: '昨天', likes: 31 },
+];
+
+function openWishTree() {
+  openSub('sub-wish');
+  renderWishListPage();
+}
+
+function renderWishListPage() {
+  const container = document.getElementById('wishListPage');
+  container.innerHTML = '';
+  SAMPLE_WISHES.forEach((w, i) => {
+    container.appendChild(createWishCard(w, i));
+  });
+}
+
+function createWishCard(w, idx) {
+  const div = document.createElement('div');
+  div.className = 'wish-card';
+  div.innerHTML = `
+    <div class="wish-header">
+      <div class="wish-avatar">${w.avatar}</div>
+      <div class="wish-user">${w.user}</div>
+      <div class="wish-time">${w.time}</div>
+    </div>
+    <div class="wish-content">${w.content}</div>
+    <div class="wish-footer">
+      <div class="wish-action ${wishLikes[idx] ? 'liked' : ''}" onclick="toggleLike(${idx}, this)">${wishLikes[idx] ? '❤️' : '🤍'} ${w.likes + (wishLikes[idx] ? 1 : 0)}</div>
+      <div class="wish-action" onclick="showPostDetail('${w.user}', '${w.content}')">💬 评论</div>
+    </div>
+  `;
+  return div;
+}
+
+function toggleLike(idx, el) {
+  wishLikes[idx] = !wishLikes[idx];
+  el.className = 'wish-action ' + (wishLikes[idx] ? 'liked' : '');
+  el.textContent = (wishLikes[idx] ? '❤️' : '🤍') + ' ' + (SAMPLE_WISHES[idx].likes + (wishLikes[idx] ? 1 : 0));
+}
+
+function submitWish() {
+  const input = document.getElementById('wishInput');
+  const text = input.value.trim();
+  if (!text) return;
+  const newWish = { user: '我', avatar: '😊', content: text, time: '刚刚', likes: 0 };
+  SAMPLE_WISHES.unshift(newWish);
+  input.value = '';
+  renderWishListPage();
+  // Also update main page list
+  renderMainWishList();
+}
+
+function renderMainWishList() {
+  const container = document.getElementById('wishList');
+  container.innerHTML = '';
+  SAMPLE_WISHES.slice(0, 3).forEach((w, i) => {
+    container.appendChild(createWishCard(w, i));
+  });
+}
+
+function showPostDetail(user, content) {
+  const overlay = document.getElementById('postOverlay');
+  document.getElementById('sheetTitle').textContent = user + '的心愿';
+  document.getElementById('sheetContent').innerHTML = `<p style="font-size:15px;line-height:1.6;margin-bottom:16px;">${content}</p><div style="color:var(--text-secondary);font-size:13px;">暂无评论</div>`;
+  overlay.classList.add('active');
+  overlay.onclick = (e) => { if (e.target === overlay) overlay.classList.remove('active'); };
+}
+
+// ========== 社区 ==========
+const SAMPLE_POSTS = [
+  { user: '小明明', avatar: '😊', time: '1小时前', content: '今天天气真好，适合出门拍照！大家周末有什么计划吗？📸', likes: 15, comments: 8 },
+  { user: '星星糖', avatar: '⭐', time: '3小时前', content: '新专辑太好听了单曲循环一整天！最喜欢《勇敢》这首歌 😭🎵', likes: 32, comments: 21 },
+  { user: '阳光少年', avatar: '🌞', time: '昨天', content: '第一次来社区，感觉好温暖！希望能认识更多志同道合的朋友 ❤️', likes: 28, comments: 15 },
+  { user: '小幸运', avatar: '🍀', time: '昨天', content: '祝大家新的一周都要加油鸭！💪💪💪', likes: 19, comments: 6 },
+];
+
+function openCommunity() {
+  openSub('sub-community');
+  renderPostList();
+}
+
+function renderPostList() {
+  const container = document.getElementById('postList');
+  container.innerHTML = '';
+  SAMPLE_POSTS.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'wish-card';
+    div.style.cursor = 'pointer';
+    div.onclick = () => showPostDetail(p.user, p.content);
+    div.innerHTML = `
+      <div class="wish-header">
+        <div class="wish-avatar">${p.avatar}</div>
+        <div class="wish-user">${p.user}</div>
+        <div class="wish-time">${p.time}</div>
+      </div>
+      <div class="wish-content">${p.content}</div>
+      <div class="wish-footer">
+        <div class="wish-action">❤️ ${p.likes}</div>
+        <div class="wish-action">💬 ${p.comments}</div>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function openMessages() {
+  switchTab('msg');
+}
+
+// ========== 初始化 ==========
+renderMainWishList();
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').then(() => console.log('SW registered')).catch(e => console.log('SW failed', e));
+}
+</script>
+</body>
+</html>
